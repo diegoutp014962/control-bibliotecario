@@ -1,18 +1,14 @@
 <?php
-$host = 'localhost'; // Cambia según tu configuración
-$db = 'biblioteca_digital';
-$user = 'root'; // Reemplaza con el nombre de usuario que creaste
-$pass = ''; // Reemplaza con la contraseña que creaste
+$servername = "localhost";  // Servidor de base de datos
+$username = "root";         // Usuario (por defecto en XAMPP)
+$password = "";             // Contraseña (vacía por defecto en XAMPP)
+$database = "prueba1";   // Nombre de la base de datos
 
-// Conectar a la base de datos
-$conn = new mysqli($host, $user, $pass, $db);
+// Crear conexión
+$conn = new mysqli($servername, $username, $password, $database);
 
-// Verificar la conexión
+// Verificar conexión
 if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
-} else {
-    echo "Conexión exitosa a la base de datos '$db'";
+    die("Error de conexión: " . $conn->connect_error);
 }
-
-$conn->close();
 ?>
