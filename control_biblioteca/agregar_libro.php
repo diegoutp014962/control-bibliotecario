@@ -1,58 +1,47 @@
 <?php
-session_start();
+include 'conexion.php'; // Incluir conexión a la base de datos
 
-// Inicializar lista de libros
-if (!isset($_SESSION['libros'])) {
-    $_SESSION['libros'] = [];
-}
+// Insertar libro en la base de datos
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
+    $nombre = trim($_POST['nombre']);
+    $autor = trim($_POST['autor']);
+    $editorial = trim($_POST['editorial']);
+    $folio = trim($_POST['folio']);
 
-// Agregar libro
-if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['agregar_libro'])) {
-    $libro = trim($_POST['libro']);
-    if (!empty($libro)) {
-        $_SESSION['libros'][] = $libro;
+    if (!empty($nombre) && !empty($autor) && !empty($editorial) && !empty($folio)) {
+        $stmt = $conn->prepare("INSERT INTO libros (nombre, autor, editorial, folio) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $nombre, $autor, $editorial, $folio);
+        if ($stmt->execute()) {
+            echo "<p style='color: green;'>Libro agregado correctamente.</p>";
+        } else {
+            echo "<p style='color: red;'>Error al insertar: " . $stmt->error . "</p>";
+        }
+        $stmt->close();
+    } else {
+        echo "<p style='color: red;'>Todos los campos son obligatorios.</p>";
     }
-    header("Location: index.php");
-    exit();
 }
+
+// Obtener libros de la base de datos
+$result = $conn->query("SELECT * FROM libros");
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregar Libro</title>
+    <title>Registro de Libros</title>
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
-            background-image: url('imagenes/img01.jpg'); /* Reemplaza con el nombre correcto */
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            margin: 0;
-            padding: 20px;
+            font-family: Arial, sans-serif;
             text-align: center;
-            color: white; /* Cambiar color del texto para mayor visibilidad */
+            background-color: #f4f4f4;
         }
-        .btn-atras {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 50px;
-            height: 50px;
-            background-color: rgb(102, 0, 0);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            z-index: 1; /* Asegurar que el botón esté en frente */
-        }
-        form.main-form {
-            background: white;
-            padding: 20px;
-            margin: 20px auto;
+        .container {
             width: 50%;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
         }
@@ -64,24 +53,53 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['agregar_libro'])) {
             border-radius: 5px;
         }
         button {
-            background-color: rgb(102, 0, 0);
+            background-color: #28a745;
             color: white;
-            cursor: pointer;
             border: none;
+            cursor: pointer;
         }
         button:hover {
-            background-color: rgb(102, 0, 0);
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid black;
         }
     </style>
 </head>
 <body>
-    <form method="get" action="index.php">
-        <button class="btn-atras" type="submit">←</button>
-    </form>
-    <h1>Agregar Libro</h1>
-    <form method="POST" class="main-form">
-        <input type="text" name="libro" placeholder="Nombre del libro" required>
-        <button type="submit" name="agregar_libro">Agregar</button>
-    </form>
+    <div class="container">
+        <h2>Registro de Libros</h2>
+        <form method="POST">
+            <input type="text" name="nombre" placeholder="Nombre del libro" required>
+            <input type="text" name="autor" placeholder="Autor" required>
+            <input type="text" name="editorial" placeholder="Editorial" required>
+            <input type="text" name="folio" placeholder="Folio" required>
+            <button type="submit">Agregar Libro</button>
+        </form>
+
+        <h2>Libros Registrados</h2>
+        <table>
+            <tr>
+                <th>Nombre</th>
+                <th>Autor</th>
+                <th>Editorial</th>
+                <th>Folio</th>
+            </tr>
+            <?php while ($row = $result->fetch_assoc()): ?>
+            <tr>
+                <td><?php echo htmlspecialchars($row['nombre']); ?></td>
+                <td><?php echo htmlspecialchars($row['autor']); ?></td>
+                <td><?php echo htmlspecialchars($row['editorial']); ?></td>
+                <td><?php echo htmlspecialchars($row['folio']); ?></td>
+            </tr>
+            <?php endwhile; ?>
+        </table>
+    </div>
 </body>
 </html>
