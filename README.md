@@ -1,0 +1,8 @@
+CREATE TABLE libros (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_libro VARCHAR(255) NOT NULL,
+    autor VARCHAR(255) NOT NULL,
+    editorial VARCHAR(255) NOT NULL,
+    folio VARCHAR(50) UNIQUE NOT NULL
+);
+
