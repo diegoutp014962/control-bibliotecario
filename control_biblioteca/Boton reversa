@@ -1,0 +1,1 @@
+<button onclick="window.history.back();" class="btn-back">Volver Atrás</button>
